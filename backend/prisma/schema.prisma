@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  goal        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  criteria     Criterion[]
+  alternatives Alternative[]
+  comparisons  Comparison[]
+  results      Result[]
+
+  @@map("projects")
+}
+
+model Criterion {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  order       Int
+  parentId    String?
+  level       Int     @default(1)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  parent   Criterion?  @relation("CriterionHierarchy", fields: [parentId], references: [id])
+  children Criterion[] @relation("CriterionHierarchy")
+
+  comparisonsA Comparison[] @relation("ComparisonA")
+  comparisonsB Comparison[] @relation("ComparisonB")
+
+  @@map("criteria")
+}
+
+model Alternative {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  order       Int
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  comparisonsA Comparison[] @relation("AlternativeComparisonA")
+  comparisonsB Comparison[] @relation("AlternativeComparisonB")
+
+  @@map("alternatives")
+}
+
+model Comparison {
+  id        String   @id @default(cuid())
+  value     Float
+  type      String // 'criteria', 'alternatives'
+  contextId String? // For alternative comparisons under specific criterion
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // For criterion comparisons
+  criterionAId String?
+  criterionBId String?
+  criterionA   Criterion? @relation("ComparisonA", fields: [criterionAId], references: [id])
+  criterionB   Criterion? @relation("ComparisonB", fields: [criterionBId], references: [id])
+
+  // For alternative comparisons
+  alternativeAId String?
+  alternativeBId String?
+  alternativeA   Alternative? @relation("AlternativeComparisonA", fields: [alternativeAId], references: [id])
+  alternativeB   Alternative? @relation("AlternativeComparisonB", fields: [alternativeBId], references: [id])
+
+  @@unique([projectId, criterionAId, criterionBId, contextId])
+  @@unique([projectId, alternativeAId, alternativeBId, contextId])
+  @@map("comparisons")
+}
+
+model Result {
+  id        String   @id @default(cuid())
+  data      Json // Stores weights, scores, consistency ratios
+  createdAt DateTime @default(now())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("results")
+}
