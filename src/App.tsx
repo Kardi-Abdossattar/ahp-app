@@ -22,26 +22,31 @@ function AppRoutes() {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </div>
+    );
+  }
+
+  // Authenticated layout: wrap the Routes with ProjectProvider (not inside Routes)
   return (
     <div className="min-h-screen bg-gray-50">
-      {user && <Navbar />}
-      <Routes>
-        {!user ? (
-          <>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </>
-        ) : (
-          <ProjectProvider>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/projects/:id" element={<ProjectDetail />} />
-            <Route path="/projects/:id/compare" element={<ComparisonWizard />} />
-            <Route path="/projects/:id/results" element={<Results />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </ProjectProvider>
-        )}
-      </Routes>
+      <Navbar />
+      <ProjectProvider>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/projects/:id/compare" element={<ComparisonWizard />} />
+          <Route path="/projects/:id/results" element={<Results />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ProjectProvider>
     </div>
   );
 }

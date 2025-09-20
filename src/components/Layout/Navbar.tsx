@@ -1,22 +1,18 @@
-import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   LogOut, 
   Home, 
   BarChart3, 
-  User,
-  ChevronDown
+  User
 } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    await logout();
   };
 
   const isActive = (path: string) => location.pathname === path;

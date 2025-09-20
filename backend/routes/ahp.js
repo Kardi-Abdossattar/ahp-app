@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
-import { calculateAHP, buildPairwiseMatrix, computeEigenvector, calculateConsistency } from '../utils/ahpEngine.js';
+import { calculateAHP, calculateAHPWithCustomCriteriaWeights, buildPairwiseMatrix, computeEigenvector, calculateConsistency } from '../utils/ahpEngine.js';
 
 const router = express.Router();
 
@@ -21,41 +21,64 @@ router.post('/comparisons', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Prepare comparison data
-    const comparisonData = {
-      projectId,
-      type,
-      value: parseFloat(value),
-      contextId,
-    };
-
-    if (type === 'criteria') {
-      comparisonData.criterionAId = itemAId;
-      comparisonData.criterionBId = itemBId;
-    } else if (type === 'alternatives') {
-      comparisonData.alternativeAId = itemAId;
-      comparisonData.alternativeBId = itemBId;
+    // Basic validation
+    const numericValue = parseFloat(value);
+    if (!projectId || !type || !itemAId || !itemBId || Number.isNaN(numericValue)) {
+      return res.status(400).json({ message: 'Invalid payload' });
     }
 
-    // Create or update comparison
-    const comparison = await req.prisma.comparison.upsert({
-      where: {
-        projectId_criterionAId_criterionBId_contextId: type === 'criteria' ? {
+    // Prepare comparison data to create
+    const comparisonData = (
+      type === 'criteria'
+        ? {
+            projectId,
+            type,
+            value: numericValue,
+            // no contextId for criteria comparisons
+            criterionAId: itemAId,
+            criterionBId: itemBId,
+          }
+        : {
+            projectId,
+            type,
+            value: numericValue,
+            // alternatives must specify the criterion context
+            contextId: contextId,
+            alternativeAId: itemAId,
+            alternativeBId: itemBId,
+          }
+    );
+
+    // Build a single valid where object depending on the type
+    let where;
+    if (type === 'criteria') {
+      where = {
+        projectId_criterionAId_criterionBId: {
           projectId,
           criterionAId: itemAId,
           criterionBId: itemBId,
-          contextId: contextId || null,
-        } : undefined,
-        projectId_alternativeAId_alternativeBId_contextId: type === 'alternatives' ? {
+        },
+      };
+    } else if (type === 'alternatives') {
+      if (!contextId) {
+        return res.status(400).json({ message: 'contextId is required for alternative comparisons' });
+      }
+      where = {
+        projectId_alternativeAId_alternativeBId_contextId: {
           projectId,
           alternativeAId: itemAId,
           alternativeBId: itemBId,
-          contextId: contextId || null,
-        } : undefined,
-      },
-      update: {
-        value: parseFloat(value),
-      },
+          contextId: contextId,
+        },
+      };
+    } else {
+      return res.status(400).json({ message: 'Invalid comparison type' });
+    }
+
+    // Create or update comparison with a valid unique where
+    const comparison = await req.prisma.comparison.upsert({
+      where,
+      update: { value: numericValue },
       create: comparisonData,
     });
 
@@ -200,20 +223,47 @@ router.post('/sensitivity/:projectId', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    // Perform sensitivity analysis
+    // Calculate baseline results
     const originalResults = await calculateAHP(project);
-    
-    // Simulate weight change
-    const sensitivityResults = await calculateAHPWithWeightChange(
-      project, 
-      criterionId, 
-      parseFloat(newWeight)
-    );
+
+    // Build a criteria weights map from original results
+    const weightsById = {};
+    for (const cw of originalResults.criteriaWeights) {
+      weightsById[cw.id] = cw.weight;
+    }
+
+    // Apply new absolute weight for the target criterion and renormalize
+    const target = parseFloat(newWeight);
+    weightsById[criterionId] = isNaN(target) ? weightsById[criterionId] : target;
+    // Renormalize to sum=1
+    const sumW = Object.values(weightsById).reduce((a, b) => a + (b || 0), 0) || 1;
+    Object.keys(weightsById).forEach(k => { weightsById[k] = (weightsById[k] || 0) / sumW; });
+
+    // Recompute results using consistent criteria matrix derived from desired weights
+    const modifiedResults = await calculateAHPWithCustomCriteriaWeights(project, weightsById);
 
     const analysis = {
       original: originalResults,
-      modified: sensitivityResults,
-      changes: calculateChanges(originalResults, sensitivityResults),
+      modified: modifiedResults,
+      changes: calculateChanges(originalResults, modifiedResults),
+      consistency: {
+        original: {
+          overall: originalResults.overallConsistency,
+          criteriaCR: (originalResults.criteriaWeights || []).map(cw => ({
+            id: cw.id,
+            name: cw.name,
+            consistencyRatio: cw.consistencyRatio ?? 0,
+          })),
+        },
+        modified: {
+          overall: modifiedResults.overallConsistency,
+          criteriaCR: (modifiedResults.criteriaWeights || []).map(cw => ({
+            id: cw.id,
+            name: cw.name,
+            consistencyRatio: cw.consistencyRatio ?? 0,
+          })),
+        },
+      },
     };
 
     res.json(analysis);
@@ -224,47 +274,8 @@ router.post('/sensitivity/:projectId', authenticateToken, async (req, res) => {
 });
 
 // Helper function for sensitivity analysis
-async function calculateAHPWithWeightChange(project, criterionId, newWeight) {
-  // This is a simplified implementation
-  // In a full implementation, you would adjust the pairwise comparisons
-  // to reflect the new weight and recalculate
-  const results = await calculateAHP(project);
-  
-  // Find the criterion and adjust its weight
-  const criterionIndex = results.criteriaWeights.findIndex(w => w.id === criterionId);
-  if (criterionIndex !== -1) {
-    // Normalize other weights
-    const oldWeight = results.criteriaWeights[criterionIndex].weight;
-    const adjustment = newWeight - oldWeight;
-    const remainingWeight = 1 - newWeight;
-    const currentRemainingWeight = 1 - oldWeight;
-    
-    results.criteriaWeights.forEach((w, i) => {
-      if (i === criterionIndex) {
-        w.weight = newWeight;
-      } else if (currentRemainingWeight > 0) {
-        w.weight = w.weight * (remainingWeight / currentRemainingWeight);
-      }
-    });
-    
-    // Recalculate final scores
-    results.finalScores = results.finalScores.map(score => {
-      let newScore = 0;
-      results.criteriaWeights.forEach(cw => {
-        const altScore = results.alternativeScores[cw.id]?.find(as => as.id === score.id);
-        if (altScore) {
-          newScore += cw.weight * altScore.score;
-        }
-      });
-      return { ...score, score: newScore };
-    });
-    
-    // Re-sort by score
-    results.finalScores.sort((a, b) => b.score - a.score);
-  }
-  
-  return results;
-}
+// Note: previous simplified calculateAHPWithWeightChange removed in favor of
+// calculateAHPWithCustomCriteriaWeights for more faithful sensitivity results.
 
 function calculateChanges(original, modified) {
   const changes = [];

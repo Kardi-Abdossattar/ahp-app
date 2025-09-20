@@ -100,7 +100,10 @@ model Comparison {
   alternativeA   Alternative? @relation("AlternativeComparisonA", fields: [alternativeAId], references: [id])
   alternativeB   Alternative? @relation("AlternativeComparisonB", fields: [alternativeBId], references: [id])
 
-  @@unique([projectId, criterionAId, criterionBId, contextId])
+  // Unique constraints
+  // Criteria comparisons are unique per project and criterion pair (no contextId)
+  @@unique([projectId, criterionAId, criterionBId])
+  // Alternative comparisons are unique per project, alternative pair, and context criterion
   @@unique([projectId, alternativeAId, alternativeBId, contextId])
   @@map("comparisons")
 }

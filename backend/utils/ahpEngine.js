@@ -21,6 +21,112 @@ export function buildPairwiseMatrix(items, comparisons) {
   return matrix;
 }
 
+// Build a perfectly consistent pairwise matrix from a weights vector
+// items: array of criteria (with id), weightsById: map { [id]: weight }
+export function buildConsistentMatrixFromWeights(items, weightsById) {
+  const n = items.length;
+  const matrix = Array(n).fill(null).map(() => Array(n).fill(1));
+  // Build ratios a_ij = w_i / w_j
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const wi = weightsById[items[i].id] ?? 0;
+      const wj = weightsById[items[j].id] ?? 0;
+      matrix[i][j] = wj === 0 ? 0 : wi / wj;
+    }
+  }
+  return matrix;
+}
+
+// Calculate AHP results using provided criteria weights (used for sensitivity analysis)
+export async function calculateAHPWithCustomCriteriaWeights(project, criteriaWeightsById) {
+  const { criteria, alternatives, comparisons } = project;
+
+  if (criteria.length === 0) {
+    throw new Error('No criteria defined');
+  }
+  if (alternatives.length === 0) {
+    throw new Error('No alternatives defined');
+  }
+
+  // Ensure weights are normalized
+  const sumW = criteria.reduce((acc, c) => acc + (criteriaWeightsById[c.id] ?? 0), 0) || 1;
+  const normalizedWeightsById = {};
+  for (const c of criteria) {
+    const w = criteriaWeightsById[c.id] ?? 0;
+    normalizedWeightsById[c.id] = w / sumW;
+  }
+
+  // Build a consistent criteria matrix from desired weights (for consistency reporting)
+  const criteriaMatrix = buildConsistentMatrixFromWeights(criteria, normalizedWeightsById);
+  // Derive weights back (should match desired weights)
+  const weightsVector = computeEigenvector(criteriaMatrix);
+  const criteriaConsistency = calculateConsistency(criteriaMatrix, weightsVector);
+
+  // Calculate alternative weights for each criterion (unchanged from original, based on saved comparisons)
+  const alternativeComparisons = comparisons.filter(c => c.type === 'alternatives');
+  const alternativeScores = {};
+  const alternativeConsistencies = {};
+  for (const criterion of criteria) {
+    const contextComparisons = alternativeComparisons.filter(c => c.contextId === criterion.id);
+    const altMatrix = buildPairwiseMatrix(alternatives, contextComparisons);
+    const altWeights = computeEigenvector(altMatrix);
+    const altConsistency = calculateConsistency(altMatrix, altWeights);
+    alternativeScores[criterion.id] = alternatives.map((alt, index) => ({
+      id: alt.id,
+      name: alt.name,
+      score: altWeights[index] || 0,
+    }));
+    alternativeConsistencies[criterion.id] = altConsistency;
+  }
+
+  // Map weights in criteria order for final score computation
+  const criteriaWeightsOrdered = criteria.map(c => normalizedWeightsById[c.id] || 0);
+
+  // Calculate final scores using the custom criteria weights
+  const finalScores = alternatives.map(alt => {
+    let totalScore = 0;
+    criteria.forEach((criterion, index) => {
+      const altScore = alternativeScores[criterion.id]?.find(s => s.id === alt.id);
+      if (altScore && criteriaWeightsOrdered[index]) {
+        totalScore += criteriaWeightsOrdered[index] * altScore.score;
+      }
+    });
+    return { id: alt.id, name: alt.name, score: totalScore };
+  });
+  finalScores.sort((a, b) => b.score - a.score);
+
+  // Overall consistency (use same aggregation as base calc)
+  let overallCR = 0;
+  let totalWeight = 0;
+  criteria.forEach((criterion) => {
+    const weight = normalizedWeightsById[criterion.id] || 0;
+    const consistency = alternativeConsistencies[criterion.id];
+    overallCR += (consistency.consistencyRatio || 0) * weight;
+    totalWeight += weight;
+  });
+  if (totalWeight > 0) {
+    overallCR = (overallCR + criteriaConsistency.consistencyRatio) / (totalWeight + 1);
+  }
+
+  return {
+    criteriaWeights: criteria.map((criterion) => ({
+      id: criterion.id,
+      name: criterion.name,
+      weight: normalizedWeightsById[criterion.id] || 0,
+      consistencyRatio: alternativeConsistencies[criterion.id]?.consistencyRatio || 0,
+    })),
+    alternativeScores,
+    finalScores,
+    consistencyAnalysis: {
+      criteria: { ...criteriaConsistency, matrix: criteriaMatrix },
+      alternatives: alternativeConsistencies,
+    },
+    overallConsistency: {
+      consistencyRatio: overallCR,
+      isConsistent: overallCR <= 0.1,
+    },
+  };
+}
 export function computeEigenvector(matrix) {
   const n = matrix.length;
   if (n === 0) return [];

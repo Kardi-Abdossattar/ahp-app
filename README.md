@@ -160,6 +160,33 @@ GET  /api/ahp/results/:id         # Get latest results
 POST /api/ahp/sensitivity/:id     # Perform sensitivity analysis
 ```
 
+#### Sensitivity Analysis (details)
+- Endpoint: `POST /api/ahp/sensitivity/:projectId`
+- Body:
+  ```json
+  {
+    "criterionId": "<criterion-id>",
+    "newWeight": 0.35
+  }
+  ```
+- Behavior:
+  - Computes baseline results, then recomputes using a consistent criteria matrix derived from the requested `newWeight` for the target criterion (other criteria are re-normalized).
+  - Alternative comparison matrices remain as collected from pairwise comparisons.
+- Response:
+  ```json
+  {
+    "original": { /* baseline results */ },
+    "modified": { /* recomputed results */ },
+    "changes": [
+      { "id": "<alt-id>", "name": "<alt>", "originalScore": 0.31, "newScore": 0.37, "changePercent": 19.35 }
+    ],
+    "consistency": {
+      "original": { "overall": { "consistencyRatio": 0.07, "isConsistent": true }, "criteriaCR": [ { "id": "...", "name": "...", "consistencyRatio": 0.05 } ] },
+      "modified": { "overall": { "consistencyRatio": 0.08, "isConsistent": true }, "criteriaCR": [ { "id": "...", "name": "...", "consistencyRatio": 0.05 } ] }
+    }
+  }
+  ```
+
 ### Reports
 ```
 GET /api/reports/pdf/:id    # Generate PDF report
@@ -233,6 +260,20 @@ JWT_SECRET="your-secret-key"
 NODE_ENV="development"
 PORT=3001
 ```
+
+### Structured Errors and Logging
+- Every request includes a `requestId` for traceability.
+- Error responses follow a structured shape:
+  ```json
+  {
+    "ok": false,
+    "message": "Human-readable message",
+    "code": "INTERNAL_ERROR | NOT_FOUND | ...",
+    "requestId": "uuid",
+    "stack": "<only in development>"
+  }
+  ```
+- Logs include the request ID and timing via `morgan`.
 
 **Frontend (.env)**
 ```

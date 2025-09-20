@@ -24,8 +24,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Remove token and notify app to handle via React Router
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Dispatch a custom event so AuthContext can react and clear state
+      window.dispatchEvent(new CustomEvent('auth:unauthorized'));
     }
     return Promise.reject(error);
   }

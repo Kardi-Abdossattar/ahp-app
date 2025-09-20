@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
 interface User {
@@ -13,7 +14,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
@@ -43,6 +45,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [token]);
 
+  // Handle global 401s signaled by the API layer without hard reloads
+  useEffect(() => {
+    const onUnauthorized = () => {
+      // Perform a clean logout and navigate to login
+      logout();
+    };
+    window.addEventListener('auth:unauthorized', onUnauthorized as EventListener);
+    return () => window.removeEventListener('auth:unauthorized', onUnauthorized as EventListener);
+  }, []);
+
   const login = async (email: string, password: string) => {
     const response = await authAPI.login(email, password);
     setUser(response.user);
@@ -57,10 +69,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('token', response.token);
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+    } catch (e) {
+      // ignore logout errors
+    } finally {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem('token');
+      navigate('/login', { replace: true });
+    }
   };
 
   const value = {
