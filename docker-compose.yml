@@ -23,7 +23,7 @@ services:
       dockerfile: backend/Dockerfile
     environment:
       - DATABASE_URL=postgresql://ahp_user:ahp_password@postgres:5432/ahp_db
-      - JWT_SECRET=CHANGE_ME_TO_A_LONG_RANDOM_SECRET_IN_PROD_32+chars
+      - JWT_SECRET=Xerw8704
       - NODE_ENV=production
       - PORT=3001
       - FRONTEND_URL=http://localhost:5173
