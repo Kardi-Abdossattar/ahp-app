@@ -23,199 +23,44 @@ A complete web application for making complex decisions using the Analytic Hiera
 
 ## Tech Stack
 
-- **Frontend**: React 18 + TypeScript + Tailwind CSS + Vite
 - **Backend**: Node.js + Express + TypeScript
 - **Database**: PostgreSQL + Prisma ORM
 - **Authentication**: JWT tokens
 - **Charts**: Recharts
 - **PDF Generation**: Puppeteer
-- **Deployment**: Docker + Docker Compose
 
 ## Quick Start
 
 ### Prerequisites
 - Node.js 18+ 
-- PostgreSQL 15+
-- Docker (optional)
-
-### Local Development
-
-1. **Clone and install dependencies**
-```bash
-git clone <repository>
-cd ahp-decision-support
-npm install
-cd backend && npm install
-```
-
-2. **Set up the database**
-```bash
-# Create PostgreSQL database
-createdb ahp_db
-
-# Copy environment file
-cp backend/.env.example backend/.env
-
-# Update DATABASE_URL in backend/.env
-# DATABASE_URL="postgresql://username:password@localhost:5432/ahp_db"
-
-# Generate Prisma client and run migrations
-cd backend
-npx prisma migrate dev
-npx prisma generate
-```
-
-3. **Seed the database (optional)**
-```bash
-cd backend
-npm run db:seed
-```
-
-4. **Start development servers**
-```bash
-# Start both frontend and backend
-npm run dev:full
-
-# Or start separately:
-# Terminal 1: Frontend
-npm run dev
-
-# Terminal 2: Backend  
-cd backend && npm run dev
-```
-
+{{ ... }}
 5. **Access the application**
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3001/api
 - Demo credentials: demo@ahp.com / demo123
 
-### Docker Deployment
+## Deployment (non-Docker)
 
-1. **Start all services**
+For local development, run frontend and backend directly:
 ```bash
-docker-compose up -d
+# Terminal 1 (frontend)
+npm run dev
+# Terminal 2 (backend)
+cd backend && npm run dev
 ```
-
-2. **Run database migrations**
-```bash
-docker-compose exec backend npx prisma migrate deploy
-docker-compose exec backend npx prisma db seed
-```
-
-3. **Access the application**
-- Application: http://localhost:5173
-- API: http://localhost:3001/api
+For production, build the frontend and serve via a static file server or reverse proxy (e.g., Nginx), and run the backend with a process manager (e.g., PM2). Ensure environment variables are set and the database is reachable.
 
 ## Usage Guide
 
 ### 1. Create a Project
 - Click "New Project" on the dashboard
-- Define your decision goal (e.g., "Choose the best laptop")
-- Add a description
-
-### 2. Build the Hierarchy
-- Add **Criteria**: Factors to evaluate (Performance, Price, Portability)
-- Add **Alternatives**: Options to choose from (MacBook Pro, Dell XPS, etc.)
-- Minimum: 2 criteria and 2 alternatives
-
-### 3. Make Pairwise Comparisons
-- Compare criteria importance using Saaty's 1-9 scale
-- Compare alternatives for each criterion
-- The system guides you through all required comparisons
-
-### 4. Calculate and Review Results
-- Run AHP calculations
-- Review final rankings and scores
-- Check consistency ratios (should be ≤ 0.1)
-- Perform sensitivity analysis
-- Download PDF report
-
-## API Documentation
-
-### Authentication Endpoints
-```
-POST /api/auth/register    # Create new user
-POST /api/auth/login       # User login
-GET  /api/auth/me         # Get current user
-POST /api/auth/logout     # User logout
-```
-
-### Project Endpoints
-```
-GET    /api/projects           # Get all user projects
-GET    /api/projects/:id       # Get project details
-POST   /api/projects           # Create new project
-PUT    /api/projects/:id       # Update project
-DELETE /api/projects/:id       # Delete project
-POST   /api/projects/:id/criteria      # Add criterion
-POST   /api/projects/:id/alternatives  # Add alternative
-```
-
-### AHP Endpoints
-```
-POST /api/ahp/comparisons         # Save pairwise comparison
-GET  /api/ahp/comparisons/:id     # Get project comparisons
-POST /api/ahp/calculate/:id       # Run AHP calculations
-GET  /api/ahp/results/:id         # Get latest results
-POST /api/ahp/sensitivity/:id     # Perform sensitivity analysis
-```
-
-#### Sensitivity Analysis (details)
-- Endpoint: `POST /api/ahp/sensitivity/:projectId`
-- Body:
-  ```json
-  {
-    "criterionId": "<criterion-id>",
-    "newWeight": 0.35
-  }
-  ```
-- Behavior:
-  - Computes baseline results, then recomputes using a consistent criteria matrix derived from the requested `newWeight` for the target criterion (other criteria are re-normalized).
-  - Alternative comparison matrices remain as collected from pairwise comparisons.
-- Response:
-  ```json
-  {
-    "original": { /* baseline results */ },
-    "modified": { /* recomputed results */ },
-    "changes": [
-      { "id": "<alt-id>", "name": "<alt>", "originalScore": 0.31, "newScore": 0.37, "changePercent": 19.35 }
-    ],
-    "consistency": {
-      "original": { "overall": { "consistencyRatio": 0.07, "isConsistent": true }, "criteriaCR": [ { "id": "...", "name": "...", "consistencyRatio": 0.05 } ] },
-      "modified": { "overall": { "consistencyRatio": 0.08, "isConsistent": true }, "criteriaCR": [ { "id": "...", "name": "...", "consistencyRatio": 0.05 } ] }
-    }
-  }
-  ```
-
-### Reports
-```
-GET /api/reports/pdf/:id    # Generate PDF report
-```
-
-## Project Structure
-
-```
-ahp-decision-support/
-├── src/                    # Frontend React app
-│   ├── components/         # Reusable UI components
-│   ├── contexts/          # React contexts (Auth, Projects)
-│   ├── pages/             # Page components
-│   ├── services/          # API service layer
-│   └── App.tsx            # Main app component
-├── backend/               # Backend Node.js app
+{{ ... }}
 │   ├── routes/           # Express routes
 │   ├── middleware/       # Auth middleware
 │   ├── utils/            # AHP calculation engine
 │   ├── prisma/           # Database schema and migrations
 │   └── server.js         # Express server
-├── docker-compose.yml    # Docker configuration
-└── README.md            # Documentation
-```
-
-## AHP Methodology
-
-This application implements the complete Analytic Hierarchy Process:
-
+211→└── README.md            # Documentation
 1. **Problem Decomposition**: Break down complex decisions into hierarchies
 2. **Pairwise Comparisons**: Compare elements using consistent judgments
 3. **Priority Derivation**: Calculate weights using eigenvector method
