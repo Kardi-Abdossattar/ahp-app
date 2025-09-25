@@ -13,7 +13,7 @@ services:
     region: oregon
     plan: free
     rootDir: backend
-    buildCommand: npm ci && npx prisma generate
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy
     startCommand: npm start
     autoDeploy: true
     envVars:
@@ -27,6 +27,4 @@ services:
         value: production
       - key: FRONTEND_URL
         # Replace this with your actual Netlify site URL
-        value: https://YOUR-SITE.netlify.app
-    # Run DB migrations automatically after each deploy
-    postDeployCommand: npx prisma migrate deploy
+        value: https://grand-zuccutto-4f2782.netlify.app/login
