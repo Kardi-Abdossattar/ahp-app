@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "dev:full": "concurrently \"npm run dev\" \"cd backend && npm run dev\"",
-    "build:full": "npm run build && cd backend && npm run build"
+    "build:full": "npm run build && cd backend && npm run build",
+    "build-demo": "node scripts/build-demo.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.2.0",

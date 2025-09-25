@@ -2,6 +2,15 @@
 
 A complete web application for making complex decisions using the Analytic Hierarchy Process (AHP) method. This production-ready system helps individuals and organizations structure decision problems, perform pairwise comparisons, and generate comprehensive analysis reports.
 
+## 🌟 Live Demo
+
+**Try the static demo (no backend required):**
+- 🏠 **[Demo Homepage](https://yourusername.github.io/ahp-app/)** - Overview and methodology
+- 💻 **[Laptop Selection Analysis](https://yourusername.github.io/ahp-app/laptops.html)** - Software development laptop comparison
+- 🚗 **[Car Selection Analysis](https://yourusername.github.io/ahp-app/cars.html)** - Family SUV comparison
+
+> **Note:** Replace `yourusername` and `ahp-app` with your actual GitHub username and repository name.
+
 ## Features
 
 ### Core Functionality
@@ -140,6 +149,57 @@ VITE_API_URL="http://localhost:3001/api"
 - Enable CORS only for production domains
 - Set up rate limiting
 - Regular security updates
+
+## 🚀 Static Demo for GitHub Pages
+
+This project includes a complete static demo that can be published on GitHub Pages without requiring any backend infrastructure.
+
+### Building the Static Demo
+
+1. **Generate demo data** (run once):
+   ```bash
+   # Start your backend
+   cd backend && npm start
+   
+   # In another terminal, initialize demo data
+   curl http://localhost:3001/api/public/init
+   ```
+
+2. **Build static files**:
+   ```bash
+   npm run build-demo
+   ```
+
+3. **Deploy to GitHub Pages**:
+   ```bash
+   # Commit the gh-pages folder
+   git add gh-pages/
+   git commit -m "Add static demo for GitHub Pages"
+   git push origin main
+   
+   # Create and push gh-pages branch
+   git subtree push --prefix gh-pages origin gh-pages
+   ```
+
+4. **Enable GitHub Pages**:
+   - Go to your repository settings
+   - Navigate to "Pages" section
+   - Select "Deploy from a branch"
+   - Choose `gh-pages` branch and `/ (root)` folder
+   - Save settings
+
+### Demo Features
+- ✅ **No Backend Required**: Pure static HTML/CSS/JS
+- 📊 **Interactive Charts**: Using Chart.js from CDN
+- 📱 **Responsive Design**: Works on all devices
+- 🎯 **Real AHP Results**: Pre-computed with logical comparisons
+- 🚀 **Fast Loading**: Optimized for GitHub Pages
+
+### Demo Content
+- **Laptop Selection**: Performance vs Price vs Portability analysis
+- **Car Selection**: Safety vs Fuel Efficiency vs Comfort vs Price analysis
+- **Visual Charts**: Bar charts for criteria weights, pie charts for final scores
+- **Detailed Tables**: Rankings, weights, and consistency analysis
 
 ## Contributing
 

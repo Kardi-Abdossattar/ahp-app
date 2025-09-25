@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import ahpRoutes from './routes/ahp.js';
 import reportRoutes from './routes/reports.js';
+import publicRoutes from './routes/public.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -43,12 +44,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/ahp', ahpRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/public', publicRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
-
 // Error handling (structured)
 app.use((error, req, res, next) => {
   const status = error.status || 500;

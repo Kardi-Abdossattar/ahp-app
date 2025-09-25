@@ -1,0 +1,124 @@
+{
+  "id": "cmfrck9t200028lazi0g66wy8",
+  "title": "Laptop Selection",
+  "description": "Choose the best laptop for software development",
+  "goal": "Select the optimal laptop considering performance, price, and portability",
+  "criteriaCount": 3,
+  "alternativesCount": 4,
+  "results": {
+    "finalScores": [
+      {
+        "id": "cmfrck9ta00098lazpfzwq2je",
+        "name": "MacBook Pro 16\"",
+        "score": 0.3355580390544251
+      },
+      {
+        "id": "cmfrck9ta000b8lazbddunyev",
+        "name": "ThinkPad X1 Carbon",
+        "score": 0.2732308053657446
+      },
+      {
+        "id": "cmfrck9ta000a8lazvw4fnumd",
+        "name": "Dell XPS 15",
+        "score": 0.2471259873765889
+      },
+      {
+        "id": "cmfrck9ta000c8lazn77fcavi",
+        "name": "Surface Laptop Studio",
+        "score": 0.1440851682032416
+      }
+    ],
+    "criteriaWeights": [
+      {
+        "id": "cmfrck9t500048lazz7t6ylw4",
+        "name": "Performance",
+        "weight": 0.6483290138222367,
+        "consistencyRatio": 0.00537725760749039
+      },
+      {
+        "id": "cmfrck9t700068lazddr64fjp",
+        "name": "Price",
+        "weight": 0.1220201921151262,
+        "consistencyRatio": 0.02490384019038738
+      },
+      {
+        "id": "cmfrck9t900088lazc2i2luli",
+        "name": "Portability",
+        "weight": 0.2296507940626371,
+        "consistencyRatio": 0.02832081591792667
+      }
+    ],
+    "alternativeScores": {
+      "cmfrck9t500048lazz7t6ylw4": [
+        {
+          "id": "cmfrck9ta00098lazpfzwq2je",
+          "name": "MacBook Pro 16\"",
+          "score": 0.483189025963026
+        },
+        {
+          "id": "cmfrck9ta000a8lazvw4fnumd",
+          "name": "Dell XPS 15",
+          "score": 0.271717157177482
+        },
+        {
+          "id": "cmfrck9ta000b8lazbddunyev",
+          "name": "ThinkPad X1 Carbon",
+          "score": 0.08821784301963291
+        },
+        {
+          "id": "cmfrck9ta000c8lazn77fcavi",
+          "name": "Surface Laptop Studio",
+          "score": 0.1568759738398591
+        }
+      ],
+      "cmfrck9t700068lazddr64fjp": [
+        {
+          "id": "cmfrck9ta00098lazpfzwq2je",
+          "name": "MacBook Pro 16\"",
+          "score": 0.05707351933477753
+        },
+        {
+          "id": "cmfrck9ta000a8lazvw4fnumd",
+          "name": "Dell XPS 15",
+          "score": 0.2468605341899127
+        },
+        {
+          "id": "cmfrck9ta000b8lazbddunyev",
+          "name": "ThinkPad X1 Carbon",
+          "score": 0.553097632671178
+        },
+        {
+          "id": "cmfrck9ta000c8lazn77fcavi",
+          "name": "Surface Laptop Studio",
+          "score": 0.1429683138041317
+        }
+      ],
+      "cmfrck9t900088lazc2i2luli": [
+        {
+          "id": "cmfrck9ta00098lazpfzwq2je",
+          "name": "MacBook Pro 16\"",
+          "score": 0.0667467867060477
+        },
+        {
+          "id": "cmfrck9ta000a8lazvw4fnumd",
+          "name": "Dell XPS 15",
+          "score": 0.1778435001034432
+        },
+        {
+          "id": "cmfrck9ta000b8lazbddunyev",
+          "name": "ThinkPad X1 Carbon",
+          "score": 0.6468409543658106
+        },
+        {
+          "id": "cmfrck9ta000c8lazn77fcavi",
+          "name": "Surface Laptop Studio",
+          "score": 0.1085687588246985
+        }
+      ]
+    },
+    "overallConsistency": {
+      "isConsistent": true,
+      "consistencyRatio": 0.008106949840472912
+    }
+  }
+}
