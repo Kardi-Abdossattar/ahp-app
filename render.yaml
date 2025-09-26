@@ -1,0 +1,30 @@
+# Render Infrastructure as Code configuration for backend deployment
+# Docs: https://render.com/docs/infrastructure-as-code
+
+databases:
+  - name: ahp-db
+    databaseName: ahp_db
+    plan: free
+
+services:
+  - type: web
+    name: ahp-backend
+    env: node
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ahp-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        # Replace this with your actual Netlify site URL
+        value: https://grand-zuccutto-4f2782.netlify.app/login

@@ -1,0 +1,26 @@
+# Netlify configuration for frontend (Vite + React)
+# Backend API should be hosted separately (Render/Railway/Fly/etc.)
+
+[build]
+  command = "npm ci && npm run build"
+  publish = "dist"
+  node_version = "18"
+
+  # Optionally set environment variables here (recommended to set in Netlify UI instead)
+  # [build.environment]
+  #   VITE_API_URL = "https://your-backend.example.com/api"
+
+# Single Page App routing: serve index.html for all routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Optional: Proxy API requests to your backend
+# 1) Set your backend base URL below (https://<your-backend-host>)
+# 2) In Netlify env vars, set VITE_API_URL="/api" so the frontend calls the proxied path
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-backend.example.com/api/:splat"
+  status = 200
+  force = true
