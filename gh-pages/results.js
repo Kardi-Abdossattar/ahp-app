@@ -42,9 +42,9 @@ class AHPResultsRenderer {
         <p class="description">${this.data.description}</p>
         <p class="goal"><strong>Goal:</strong> ${this.data.goal}</p>
         <div class="stats">
-          <span class="stat">📊 ${this.data.criteriaCount} Criteria</span>
-          <span class="stat">🔍 ${this.data.alternativesCount} Alternatives</span>
-          <span class="stat">✅ Consistency: ${this.data.results.overallConsistency.isConsistent ? 'Good' : 'Poor'}</span>
+          <span class="stat">${this.data.criteriaCount} Criteria</span>
+          <span class="stat">${this.data.alternativesCount} Alternatives</span>
+          <span class="stat">Consistency: ${this.data.results.overallConsistency.isConsistent ? 'Good' : 'Poor'}</span>
         </div>
       </div>
     `;
@@ -56,7 +56,7 @@ class AHPResultsRenderer {
 
     const scores = this.data.results.finalScores;
     let html = `
-      <h2>🏆 Final Rankings</h2>
+      <h2>Final Rankings</h2>
       <table class="results-table">
         <thead>
           <tr>
@@ -95,7 +95,7 @@ class AHPResultsRenderer {
 
     const weights = this.data.results.criteriaWeights;
     let html = `
-      <h2>⚖️ Criteria Weights</h2>
+      <h2>Criteria Weights</h2>
       <table class="results-table">
         <thead>
           <tr>
@@ -240,7 +240,7 @@ class AHPResultsRenderer {
     const criteria = this.data.results.criteriaWeights;
     const altScores = this.data.results.alternativeScores;
 
-    let html = '<h2>📋 Alternatives by Criteria</h2>';
+    let html = '<h2>Alternatives by Criteria</h2>';
 
     criteria.forEach(criterion => {
       const scores = altScores[criterion.id] || [];
