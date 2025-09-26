@@ -7,12 +7,21 @@ class AHPResultsRenderer {
   async loadData(jsonPath) {
     try {
       const response = await fetch(jsonPath);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       this.data = await response.json();
       return this.data;
     } catch (error) {
       console.error('Error loading data:', error);
+      console.error('Attempted to load:', jsonPath);
       throw error;
     }
+  }
+
+  loadDataFromObject(dataObject) {
+    this.data = dataObject;
+    return this.data;
   }
 
   formatPercent(value) {
@@ -293,7 +302,27 @@ async function initializeResults(jsonPath) {
       <div class="error">
         <h1>Error Loading Results</h1>
         <p>Failed to load data from ${jsonPath}</p>
-        <p>Make sure the JSON file exists and the server is running.</p>
+        <p>Error: ${error.message}</p>
+        <p>This might be a CORS issue or the file path is incorrect.</p>
+        <p>For GitHub Pages, make sure the JSON files are in the correct location.</p>
+      </div>
+    `;
+  }
+}
+
+// Global function to initialize results from embedded data
+function initializeResultsFromData(dataObject) {
+  try {
+    const renderer = new AHPResultsRenderer();
+    renderer.loadDataFromObject(dataObject);
+    renderer.renderAll();
+  } catch (error) {
+    console.error('Failed to initialize results from data:', error);
+    document.body.innerHTML = `
+      <div class="error">
+        <h1>Error Loading Results</h1>
+        <p>Failed to process embedded data</p>
+        <p>Error: ${error.message}</p>
       </div>
     `;
   }
