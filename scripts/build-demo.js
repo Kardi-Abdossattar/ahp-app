@@ -23,8 +23,14 @@ try {
   const staticDemoDir = join(rootDir, 'static-demo');
   const demoDataDir = join(rootDir, 'demo-data');
 
-  // Copy HTML files
-  ['index.html', 'laptops.html', 'cars.html'].forEach(file => {
+  // Ensure demo-data exists
+  if (!existsSync(demoDataDir)) {
+    console.error('❌ demo-data/ directory not found. Run the backend and initialize demo data first.');
+    process.exit(1);
+  }
+
+  // Copy and process HTML files
+  ['index.html'].forEach(file => {
     const src = join(staticDemoDir, file);
     const dest = join(ghPagesDir, file);
     if (existsSync(src)) {
@@ -32,6 +38,31 @@ try {
       console.log(`✅ Copied ${file}`);
     }
   });
+
+  // Create GitHub Pages compatible versions with embedded data
+  console.log('📄 Creating GitHub Pages compatible HTML files...');
+  
+  // Read JSON data
+  const laptopData = JSON.parse(readFileSync(join(demoDataDir, 'laptops.json'), 'utf8'));
+  const carData = JSON.parse(readFileSync(join(demoDataDir, 'cars.json'), 'utf8'));
+
+  // Create laptops.html with embedded data
+  const laptopTemplate = readFileSync(join(staticDemoDir, 'laptops.html'), 'utf8');
+  const laptopHtml = laptopTemplate.replace(
+    /initializeResults\('\.\/demo-data\/laptops\.json'\)\.catch\(\(\) => \{[\s\S]*?\}\);/,
+    `initializeResultsFromData(${JSON.stringify(laptopData, null, 2)});`
+  );
+  writeFileSync(join(ghPagesDir, 'laptops.html'), laptopHtml);
+  console.log('✅ Created laptops.html with embedded data');
+
+  // Create cars.html with embedded data  
+  const carTemplate = readFileSync(join(staticDemoDir, 'cars.html'), 'utf8');
+  const carHtml = carTemplate.replace(
+    /initializeResults\('\.\/demo-data\/cars\.json'\)\.catch\(\(\) => \{[\s\S]*?\}\);/,
+    `initializeResultsFromData(${JSON.stringify(carData, null, 2)});`
+  );
+  writeFileSync(join(ghPagesDir, 'cars.html'), carHtml);
+  console.log('✅ Created cars.html with embedded data');
 
   // Copy CSS and JS files
   ['style.css', 'results.js'].forEach(file => {
@@ -58,6 +89,20 @@ try {
       console.log(`✅ Copied ${file}`);
     }
   });
+
+  // Create reports directory
+  const ghPagesReports = join(ghPagesDir, 'reports');
+  if (!existsSync(ghPagesReports)) {
+    mkdirSync(ghPagesReports, { recursive: true });
+    console.log('📁 Created reports/ directory');
+  }
+
+  // Create demo-assets directory
+  const ghPagesDemoAssets = join(ghPagesDir, 'demo-assets');
+  if (!existsSync(ghPagesDemoAssets)) {
+    mkdirSync(ghPagesDemoAssets, { recursive: true });
+    console.log('📁 Created demo-assets/ directory');
+  }
 
   // Create a simple .nojekyll file to prevent Jekyll processing
   writeFileSync(join(ghPagesDir, '.nojekyll'), '');
@@ -105,8 +150,21 @@ Built with ❤️ using the Analytic Hierarchy Process
   console.log('   - results.js (chart rendering)');
   console.log('   - demo-data/laptops.json');
   console.log('   - demo-data/cars.json');
+  console.log('   - reports/ (for PDF reports)');
+  console.log('   - demo-assets/ (for screenshots)');
   console.log('   - .nojekyll (prevents Jekyll processing)');
   console.log('   - README.md (documentation)');
+  console.log('\n📋 Manual steps required:');
+  console.log('1. Add your PDF reports to gh-pages/reports/:');
+  console.log('   - laptop-selection-report.pdf');
+  console.log('   - car-selection-report.pdf');
+  console.log('2. Add screenshots to gh-pages/demo-assets/:');
+  console.log('   - dashboard.png');
+  console.log('   - project-setup.png');
+  console.log('   - results-overview.png');
+  console.log('   - charts.png');
+  console.log('   - criteria-weights.png');
+  console.log('   - sensitivity.png');
 
 } catch (error) {
   console.error('❌ Error building demo:', error.message);

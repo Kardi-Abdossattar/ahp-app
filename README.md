@@ -165,12 +165,18 @@ This project includes a complete static demo that can be published on GitHub Pag
    curl http://localhost:3001/api/public/init
    ```
 
-2. **Build static files**:
+2. **Test locally**:
+   ```bash
+   npm run serve-demo
+   # Visit http://localhost:8080
+   ```
+
+3. **Build static files**:
    ```bash
    npm run build-demo
    ```
 
-3. **Deploy to GitHub Pages**:
+4. **Deploy to GitHub Pages**:
    ```bash
    # Commit the gh-pages folder
    git add gh-pages/
