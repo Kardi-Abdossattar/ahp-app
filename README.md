@@ -1,164 +1,39 @@
-# AHP Decision Support System
+# AHP Decision Support System (Full Version)
 
-A complete web application for making complex decisions using the Analytic Hierarchy Process (AHP) method. This production-ready system helps individuals and organizations structure decision problems, perform pairwise comparisons, and generate comprehensive analysis reports.
-
-## 🌟 Live Demo
-
-**Try the static demo (no backend required):**
-- 🏠 **[Demo Homepage](https://yourusername.github.io/ahp-app/)** - Overview and methodology
-- 💻 **[Laptop Selection Analysis](https://yourusername.github.io/ahp-app/laptops.html)** - Software development laptop comparison
-- 🚗 **[Car Selection Analysis](https://yourusername.github.io/ahp-app/cars.html)** - Family SUV comparison
-
-> **Note:** Replace `yourusername` and `ahp-app` with your actual GitHub username and repository name.
+A comprehensive web application for complex decision-making using the Analytic Hierarchy Process (AHP) method. This full-stack solution provides a complete decision support system with user authentication, project management, and advanced analysis features.
 
 ## Features
 
 ### Core Functionality
-- **Project Management**: Create and manage multiple decision projects
-- **Hierarchical Structure**: Build goal-criteria-alternatives hierarchies
-- **Pairwise Comparisons**: Interactive comparison interface using Saaty's 1-9 scale
-- **AHP Calculations**: Complete mathematical engine with eigenvector method
-- **Results Dashboard**: Visual charts, rankings, and consistency analysis
-- **PDF Reports**: Professional reports with charts and analysis
-- **Sensitivity Analysis**: What-if scenarios for weight changes
+- **User Authentication**: Secure login and registration system
+- **Project Management**: Create, save, and manage multiple decision projects
+- **Hierarchical Structure**: Build complex decision hierarchies with multiple levels
+- **Interactive Comparisons**: Intuitive interface for pairwise comparisons using Saaty's 1-9 scale
+- **Comprehensive Analysis**: Automatic calculation of priorities and consistency ratios
+- **Visual Reports**: Generate and export detailed PDF reports with charts
+- **Sensitivity Analysis**: Test how changes in weights affect the final decision
 
-### Technical Features
-- **Authentication**: JWT-based user authentication
-- **Real-time UI**: React with responsive design
-- **RESTful API**: Clean backend architecture
+### Technical Stack
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express
 - **Database**: PostgreSQL with Prisma ORM
-- **Charts**: Interactive visualization with Recharts
-- **PDF Generation**: Server-side PDF creation with Puppeteer
-
-## Tech Stack
-
-- **Backend**: Node.js + Express + TypeScript
-- **Database**: PostgreSQL + Prisma ORM
-- **Authentication**: JWT tokens
-- **Charts**: Recharts
+- **Authentication**: JWT-based security
+- **Data Visualization**: Recharts
 - **PDF Generation**: Puppeteer
 
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-{{ ... }}
-5. **Access the application**
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3001/api
-- Demo credentials: demo@ahp.com / demo123
+- Node.js 18+ and npm
+- PostgreSQL database
+- Git
 
-## Deployment (non-Docker)
+### Installation
 
-For local development, run frontend and backend directly:
-```bash
-# Terminal 1 (frontend)
-npm run dev
-# Terminal 2 (backend)
-cd backend && npm run dev
-```
-For production, build the frontend and serve via a static file server or reverse proxy (e.g., Nginx), and run the backend with a process manager (e.g., PM2). Ensure environment variables are set and the database is reachable.
-
-## Usage Guide
-
-### 1. Create a Project
-- Click "New Project" on the dashboard
-{{ ... }}
-│   ├── routes/           # Express routes
-│   ├── middleware/       # Auth middleware
-│   ├── utils/            # AHP calculation engine
-│   ├── prisma/           # Database schema and migrations
-│   └── server.js         # Express server
-211→└── README.md            # Documentation
-1. **Problem Decomposition**: Break down complex decisions into hierarchies
-2. **Pairwise Comparisons**: Compare elements using consistent judgments
-3. **Priority Derivation**: Calculate weights using eigenvector method
-4. **Consistency Checking**: Verify logical consistency of judgments
-5. **Synthesis**: Combine priorities to rank alternatives
-
-### Saaty's Scale
-- 1: Equal importance
-- 3: Moderate importance  
-- 5: Strong importance
-- 7: Very strong importance
-- 9: Extreme importance
-- 2,4,6,8: Intermediate values
-
-### Consistency Ratio
-- CR ≤ 0.1: Acceptable consistency
-- CR > 0.1: Inconsistent, review recommended
-
-## Development
-
-### Adding New Features
-1. Backend: Add routes in `backend/routes/`
-2. Database: Create Prisma migrations in `backend/prisma/migrations/`
-3. Frontend: Add components in `src/components/`
-4. API: Update `src/services/api.ts`
-
-### Running Tests
-```bash
-# Frontend tests
-npm test
-
-# Backend tests  
-cd backend && npm test
-```
-
-### Environment Variables
-
-**Backend (.env)**
-```
-DATABASE_URL="postgresql://user:pass@localhost:5432/ahp_db"
-JWT_SECRET="your-secret-key"
-NODE_ENV="development"
-PORT=3001
-```
-
-### Structured Errors and Logging
-- Every request includes a `requestId` for traceability.
-- Error responses follow a structured shape:
-  ```json
-  {
-    "ok": false,
-    "message": "Human-readable message",
-    "code": "INTERNAL_ERROR | NOT_FOUND | ...",
-    "requestId": "uuid",
-    "stack": "<only in development>"
-  }
-  ```
-- Logs include the request ID and timing via `morgan`.
-
-**Frontend (.env)**
-```
-VITE_API_URL="http://localhost:3001/api"
-```
-
-## Production Deployment
-
-### Environment Setup
-1. Set up PostgreSQL database
-2. Update environment variables
-3. Configure reverse proxy (nginx)
-4. Set up SSL certificates
-5. Configure monitoring
-
-### Security Considerations
-- Change JWT_SECRET in production
-- Use environment-specific database credentials  
-- Enable CORS only for production domains
-- Set up rate limiting
-- Regular security updates
-
-## 🚀 Static Demo for GitHub Pages
-
-This project includes a complete static demo that can be published on GitHub Pages without requiring any backend infrastructure.
-
-### Building the Static Demo
-
-1. **Generate demo data** (run once):
+1. **Clone the repository**
    ```bash
-   # Start your backend
+   git clone https://github.com/Kardi-Abdossattar/ahp-app.git
+   cd ahp-app
    cd backend && npm start
    
    # In another terminal, initialize demo data
@@ -195,11 +70,11 @@ This project includes a complete static demo that can be published on GitHub Pag
    - Save settings
 
 ### Demo Features
-- ✅ **No Backend Required**: Pure static HTML/CSS/JS
-- 📊 **Interactive Charts**: Using Chart.js from CDN
-- 📱 **Responsive Design**: Works on all devices
-- 🎯 **Real AHP Results**: Pre-computed with logical comparisons
-- 🚀 **Fast Loading**: Optimized for GitHub Pages
+- **No Backend Required**: Pure static HTML/CSS/JS
+- **Interactive Charts**: Using Chart.js from CDN
+- **Responsive Design**: Works on all devices
+- **Real AHP Results**: Pre-computed with logical comparisons
+- **Fast Loading**: Optimized for GitHub Pages
 
 ### Demo Content
 - **Laptop Selection**: Performance vs Price vs Portability analysis
@@ -217,7 +92,7 @@ This project includes a complete static demo that can be published on GitHub Pag
 
 ## License
 
-MIT License - see LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/Kardi-Abdossattar/ahp-app/blob/main/LICENSE) file for details.
 
 ## Support
 
