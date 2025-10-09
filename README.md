@@ -23,35 +23,80 @@ A comprehensive web application for complex decision-making using the Analytic H
 
 ## Quick Start
 
-### Prerequisites
-- Node.js 18+ and npm
-- PostgreSQL database
-- Git
+### 🐳 Docker Setup (Recommended)
 
-### Installation
+**Prerequisites:** Docker and Docker Compose
 
 1. **Clone the repository**
    ```bash
    git clone https://github.com/Kardi-Abdossattar/ahp-app.git
    cd ahp-app
-   cd backend && npm start
-   
-   # In another terminal, initialize demo data
-   curl http://localhost:3001/api/public/init
    ```
 
-2. **Test locally**:
+2. **Start with Docker**
+   ```bash
+   # Linux/Mac
+   chmod +x docker-start.sh
+   ./docker-start.sh
+
+   # Windows
+   docker-start.bat
+
+   # Or manually
+   docker-compose up -d
+   ```
+
+3. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend: http://localhost:3001/api
+
+📖 For detailed Docker instructions, see [DOCKER-SETUP.md](DOCKER-SETUP.md)
+
+### 💻 Manual Setup
+
+**Prerequisites:** Node.js 18+, npm, PostgreSQL
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Kardi-Abdossattar/ahp-app.git
+   cd ahp-app
+   ```
+
+2. **Setup Backend**
+   ```bash
+   cd backend
+   cp .env.example .env
+   # Edit .env with your database credentials
+   npm install
+   npx prisma migrate deploy
+   npm start
+   ```
+
+3. **Setup Frontend** (in a new terminal)
+   ```bash
+   cd ahp-app
+   npm install
+   npm run dev
+   ```
+
+4. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:3001/api
+
+### 📦 Static Demo (GitHub Pages)
+
+1. **Test locally**:
    ```bash
    npm run serve-demo
    # Visit http://localhost:8080
    ```
 
-3. **Build static files**:
+2. **Build static files**:
    ```bash
    npm run build-demo
    ```
 
-4. **Deploy to GitHub Pages**:
+3. **Deploy to GitHub Pages**:
    ```bash
    # Commit the gh-pages folder
    git add gh-pages/
@@ -69,7 +114,7 @@ A comprehensive web application for complex decision-making using the Analytic H
    - Choose `gh-pages` branch and `/ (root)` folder
    - Save settings
 
-### Demo Features
+#### Demo Features
 - **No Backend Required**: Pure static HTML/CSS/JS
 - **Interactive Charts**: Using Chart.js from CDN
 - **Responsive Design**: Works on all devices
