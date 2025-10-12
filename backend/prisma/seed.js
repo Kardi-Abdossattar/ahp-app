@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Create demo user
-  const hashedPassword = await bcrypt.hash('demo123', 12);
+  const hashedPassword = await bcrypt.hash('Demo123!', 12);
   const user = await prisma.user.upsert({
     where: { email: 'demo@ahp.com' },
     update: {},

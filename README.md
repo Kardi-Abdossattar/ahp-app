@@ -232,6 +232,8 @@ When you change one criterion weight, the system:
    - Backend API: http://localhost:3001/api
    - Health check: http://localhost:3001/api/health
 
+4. **Login with demo credentials** (see [CREDENTIALS.md](CREDENTIALS.md))
+
 ### 💻 Manual Setup
 
 **Prerequisites**: Node.js 18+, npm, PostgreSQL
@@ -257,6 +259,8 @@ When you change one criterion weight, the system:
 3. **Access the application**
    - Frontend: http://localhost:5173
    - Backend: http://localhost:3001/api
+
+4. **Login with demo credentials** (see [CREDENTIALS.md](CREDENTIALS.md))
 
 ---
 
