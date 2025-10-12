@@ -105,7 +105,7 @@ export default function Login() {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Demo credentials: demo@ahp.com / demo123
+              Use your registered account or contact admin for access
             </p>
           </div>
         </form>
